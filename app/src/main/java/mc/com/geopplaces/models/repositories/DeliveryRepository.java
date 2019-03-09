@@ -14,16 +14,18 @@ import mc.com.geopplaces.models.entities.LocationEntity;
 
 public class DeliveryRepository {
     private String endPoint = "/deliveries";
+    private static final int LIMIT_LOAD_DELIVERY = 20;
+
     public DeliveryRepository() {
 
     }
 
-    private String getDeliveriesUrl(int offset ,int limit){
-        return ConfigManager.getInstance().getWebApiRoot() + endPoint + "?offset=" + offset + "&limit=" +limit;
+    private String getDeliveriesUrl(int offset){
+        return ConfigManager.getInstance().getWebApiRoot() + endPoint + "?offset=" + offset + "&limit=" + LIMIT_LOAD_DELIVERY;
     }
 
-    public void getDeliveryList(int offset ,int limit,final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
-        ApiManager.getsInstance().GET(getDeliveriesUrl(offset,limit), new ApiServerCallback() {
+    public void getDeliveryList(int offset ,final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        ApiManager.getsInstance().GET(getDeliveriesUrl(offset), new ApiServerCallback() {
             @Override
             public boolean onSuccess(JSONArray result) {
                 onDeliveryListLoadedCallback.onSuccess(parseJsonToDeliveryList(result));
