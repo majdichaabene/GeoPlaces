@@ -1,13 +1,11 @@
 package mc.com.geopplaces.views.components;
 
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 
 public class CardOnLoadMoreScroll extends RecyclerView.OnScrollListener {
 
-    private int visibleThreshold = 5;
+    private int visibleThreshold = 1;
     private CardOnLoadMoreListener cardOnLoadMoreListener;
     private boolean isLoading;
     private int lastVisibleItem, totalItemCount;

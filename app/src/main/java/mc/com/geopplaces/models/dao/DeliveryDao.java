@@ -2,7 +2,6 @@ package mc.com.geopplaces.models.dao;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;

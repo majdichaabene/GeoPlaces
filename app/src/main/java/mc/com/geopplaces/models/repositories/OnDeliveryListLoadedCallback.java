@@ -1,7 +1,5 @@
 package mc.com.geopplaces.models.repositories;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import mc.com.geopplaces.models.entities.DeliveryEntity;

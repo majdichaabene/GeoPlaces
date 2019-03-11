@@ -11,10 +11,9 @@ import mc.com.geopplaces.managers.ApiManager;
 import mc.com.geopplaces.managers.ApiServerCallback;
 import mc.com.geopplaces.managers.ConfigManager;
 import mc.com.geopplaces.models.entities.DeliveryEntity;
-import mc.com.geopplaces.models.repositories.OnDeliveryListLoadedCallback;
 
 public class DeliveryResponse {
-    private String endPoint = "/deliveries";
+    private static final String END_POINT = "/deliveries";
     private static final int LIMIT_LOAD_DELIVERY = 20;
 
     public DeliveryResponse() {
@@ -22,7 +21,7 @@ public class DeliveryResponse {
     }
 
     private String getDeliveriesUrl(int offset){
-        return ConfigManager.getInstance().getWebApiRoot() + endPoint + "?offset=" + offset + "&limit=" + LIMIT_LOAD_DELIVERY;
+        return ConfigManager.getInstance().getWebApiRoot() + END_POINT + "?offset=" + offset + "&limit=" + LIMIT_LOAD_DELIVERY;
     }
 
     public void getDeliveryList(int offset ,final OnDeliveryResponseCallBack onDeliveryResponseCallBack){

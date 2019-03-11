@@ -2,6 +2,7 @@ package mc.com.geopplaces.models.repositories;
 
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -24,50 +25,41 @@ public class DeliveryRepository {
         deliveryRepository = new DeliveryResponse();
     }
 
-    public void getDeliveryList(Context context, final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
-        Log.e("getDeliveryList","index = "+index);
-        RealmManager.open();
-        if (Utils.isNetworkAvailable(context)){
-            deliveryRepository.getDeliveryList(0, new OnDeliveryResponseCallBack() {
-                @Override
-                public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
-                    deliveryDao.save(deliveryEntitiesResult);
-                    index = deliveryEntitiesResult.get(deliveryEntitiesResult.size()-1).getId()+1;
-                    RealmManager.close();
-                    onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
-                }
+    public void getDeliveryList(Context context,boolean hasNext, final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        Log.e("index",index+"xx");
+        try {
+            RealmManager.open();
+            if (Utils.isNetworkAvailable(context)){
+                deliveryRepository.getDeliveryList(index, new OnDeliveryResponseCallBack() {
+                    @Override
+                    public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
+                        deliveryDao.save(deliveryEntitiesResult);
+                        index = deliveryEntitiesResult.get(deliveryEntitiesResult.size()-1).getId()+1;
+                        onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
+                    }
 
-                @Override
-                public void onError(String errorState) {
-                    onDeliveryListLoadedCallback.onError(errorState);
-                }
-            });
-        } else {
-            ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
-            deliveryEntities.addAll(deliveryDao.loadAll());
+                    @Override
+                    public void onError(String errorState) {
+                        onDeliveryListLoadedCallback.onError(errorState);
+                    }
+                });
+            } else if (!hasNext){
+                ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
+                deliveryEntities.addAll(deliveryDao.loadAll());
+                index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
+                onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
+            } else{
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        onDeliveryListLoadedCallback.onError("error");
+                    }
+                },1000);
+            }
+        } finally {
             RealmManager.close();
-            index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
-            onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
         }
-    }
-    public void getNextDeliveryList(final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
-        Log.e("getNextDeliveryList","index = "+index);
-        RealmManager.open();
-        deliveryRepository.getDeliveryList(index, new OnDeliveryResponseCallBack() {
-            @Override
-            public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
-                deliveryDao.save(deliveryEntitiesResult);
-                index = deliveryEntitiesResult.get(deliveryEntitiesResult.size()-1).getId()+1;
-                RealmManager.close();
-                Log.e("vm","getNextDeliveryList : "+deliveryEntitiesResult.size()+"xxx");
-                onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
-            }
 
-            @Override
-            public void onError(String errorState) {
-                onDeliveryListLoadedCallback.onError(errorState);
-            }
-        });
     }
 
     public DeliveryEntity getDeliveryById(int id){

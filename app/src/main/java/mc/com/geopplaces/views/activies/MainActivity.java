@@ -1,19 +1,15 @@
 package mc.com.geopplaces.views.activies;
 
+import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 import mc.com.geopplaces.R;
-import mc.com.geopplaces.models.entities.DeliveryEntity;
-import mc.com.geopplaces.models.repositories.DeliveryRepository;
-import mc.com.geopplaces.models.repositories.OnDeliveryListLoadedCallback;
 import mc.com.geopplaces.views.fragments.DeliveryCardFragment;
+import mc.com.geopplaces.views.fragments.DeliveryDetailsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container_ll, DeliveryCardFragment.newInstance())
                     .addToBackStack(null)
                     .commit();
-        }
-
+            }
     }
     @Override
     public void onBackPressed() {

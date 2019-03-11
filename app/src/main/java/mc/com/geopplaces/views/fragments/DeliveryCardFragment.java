@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import mc.com.geopplaces.R;
 import mc.com.geopplaces.models.entities.DeliveryEntity;
@@ -27,15 +27,13 @@ import mc.com.geopplaces.views.components.CardOnLoadMoreScroll;
 public class DeliveryCardFragment extends Fragment {
 
     private RecyclerView deliveryRecyclerView;
+    private DeliveryAdapter deliveryAdapter;
     private RelativeLayout loadingContainer,reloadContainer;
     private Button reloadButton;
-    private DeliveryAdapter deliveryAdapter;
     private ArrayList<DeliveryEntity> deliveryEntities;
     private DeliveryRepository deliveryRepository;
     private CardOnLoadMoreScroll scrollListener;
     private LinearLayoutManager linearLayoutManager;
-    private boolean isLoadMore = false;
-    private boolean isNetworkError = false;
 
     public DeliveryCardFragment() {
         deliveryEntities = new ArrayList<>();
@@ -86,7 +84,6 @@ public class DeliveryCardFragment extends Fragment {
         scrollListener.setOnLoadMoreListener(new CardOnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                isLoadMore = true;
                 loadNextDelivery();
             }
         });
@@ -103,7 +100,7 @@ public class DeliveryCardFragment extends Fragment {
     private void loadFirstData(){
         deliveryEntities.clear();
         loadingContainer.setVisibility(View.VISIBLE);
-        deliveryRepository.getDeliveryList(getContext(),  new OnDeliveryListLoadedCallback() {
+        deliveryRepository.getDeliveryList(getContext(),false ,  new OnDeliveryListLoadedCallback() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
                 deliveryEntities.addAll(deliveryEntitiesResult);
@@ -115,17 +112,16 @@ public class DeliveryCardFragment extends Fragment {
             public void onError(String errorState) {
                 loadingContainer.setVisibility(View.GONE);
                 reloadContainer.setVisibility(View.VISIBLE);
-                isNetworkError = true;
             }
         });
     }
 
     private void loadNextDelivery(){
+        Log.e("xxx","add view");
         deliveryAdapter.addLoadingView();
-        deliveryRepository.getNextDeliveryList( new OnDeliveryListLoadedCallback() {
+        deliveryRepository.getDeliveryList(getContext(),true, new OnDeliveryListLoadedCallback() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
-                isLoadMore = false;
                 deliveryAdapter.removeLoadingView();
                 scrollListener.setLoaded();
                 deliveryEntities.addAll(deliveryEntitiesResult);
@@ -134,9 +130,9 @@ public class DeliveryCardFragment extends Fragment {
 
             @Override
             public void onError(String errorState) {
+                Log.e("xxx","remove view");
                 deliveryAdapter.removeLoadingView();
                 scrollListener.setLoaded();
-                isNetworkError = true;
             }
         });
     }

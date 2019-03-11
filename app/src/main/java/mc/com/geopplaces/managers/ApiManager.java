@@ -60,7 +60,6 @@ public class ApiManager {
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     HashMap<String, String> headers = new HashMap<String, String>();
                     headers.put("Accept", "application/json");
-
                     return headers;
                 }
 
