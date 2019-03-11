@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class DeliveryCardFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         deliveryRepository = new DeliveryRepository();
-        loadFirstData();
+        loadData(false);
     }
 
     private void initView(View view){
@@ -84,7 +83,7 @@ public class DeliveryCardFragment extends Fragment {
         scrollListener.setOnLoadMoreListener(new CardOnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                loadNextDelivery();
+                loadData(true);
             }
         });
         deliveryRecyclerView.addOnScrollListener(scrollListener);
@@ -92,47 +91,44 @@ public class DeliveryCardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 reloadContainer.setVisibility(View.GONE);
-                loadFirstData();
+                loadData(false);
             }
         });
     }
 
-    private void loadFirstData(){
-        deliveryEntities.clear();
-        loadingContainer.setVisibility(View.VISIBLE);
-        deliveryRepository.getDeliveryList(getContext(),false ,  new OnDeliveryListLoadedCallback() {
+    private void loadData(final boolean hasNext){
+        if (hasNext){
+            deliveryAdapter.addLoadingView();
+        } else {
+            deliveryEntities.clear();
+            loadingContainer.setVisibility(View.VISIBLE);
+        }
+        deliveryRepository.getDeliveryList(getContext(),hasNext ,  new OnDeliveryListLoadedCallback() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
-                deliveryEntities.addAll(deliveryEntitiesResult);
-                loadingContainer.setVisibility(View.GONE);
-                deliveryAdapter.notifyDataSetChanged();
+                if (hasNext){
+                    deliveryAdapter.removeLoadingView();
+                    scrollListener.setLoaded();
+                    deliveryEntities.addAll(deliveryEntitiesResult);
+                    deliveryAdapter.notifyDataSetChanged();
+                } else {
+                    deliveryEntities.addAll(deliveryEntitiesResult);
+                    loadingContainer.setVisibility(View.GONE);
+                    deliveryAdapter.notifyDataSetChanged();
+                }
+
             }
 
             @Override
             public void onError(String errorState) {
-                loadingContainer.setVisibility(View.GONE);
-                reloadContainer.setVisibility(View.VISIBLE);
-            }
-        });
-    }
+                if (hasNext){
+                    deliveryAdapter.removeLoadingView();
+                    scrollListener.setLoaded();
+                } else {
+                    loadingContainer.setVisibility(View.GONE);
+                    reloadContainer.setVisibility(View.VISIBLE);
+                }
 
-    private void loadNextDelivery(){
-        Log.e("xxx","add view");
-        deliveryAdapter.addLoadingView();
-        deliveryRepository.getDeliveryList(getContext(),true, new OnDeliveryListLoadedCallback() {
-            @Override
-            public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
-                deliveryAdapter.removeLoadingView();
-                scrollListener.setLoaded();
-                deliveryEntities.addAll(deliveryEntitiesResult);
-                deliveryAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(String errorState) {
-                Log.e("xxx","remove view");
-                deliveryAdapter.removeLoadingView();
-                scrollListener.setLoaded();
             }
         });
     }

@@ -16,8 +16,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:id="@+id/fragment_container_ll">
+        android:id="@+id/fragment_delivery_container_ll">
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/fragment_delivery_details_container_ll">
+    </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

@@ -3,7 +3,6 @@ package mc.com.geopplaces.models.repositories;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -26,7 +25,6 @@ public class DeliveryRepository {
     }
 
     public void getDeliveryList(Context context,boolean hasNext, final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
-        Log.e("index",index+"xx");
         try {
             RealmManager.open();
             if (Utils.isNetworkAvailable(context)){
@@ -43,18 +41,29 @@ public class DeliveryRepository {
                         onDeliveryListLoadedCallback.onError(errorState);
                     }
                 });
-            } else if (!hasNext){
-                ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
-                deliveryEntities.addAll(deliveryDao.loadAll());
-                index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
-                onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
-            } else{
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        onDeliveryListLoadedCallback.onError("error");
+            } else {
+                if(hasNext){
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onDeliveryListLoadedCallback.onError("error");
+                        }
+                    },1000);
+                } else {
+                    if (deliveryDao.loadAll().size() != 0){
+                        ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
+                        deliveryEntities.addAll(deliveryDao.loadAll());
+                        index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
+                        onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
+                    } else {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                onDeliveryListLoadedCallback.onError("error");
+                            }
+                        },1000);
                     }
-                },1000);
+                }
             }
         } finally {
             RealmManager.close();
