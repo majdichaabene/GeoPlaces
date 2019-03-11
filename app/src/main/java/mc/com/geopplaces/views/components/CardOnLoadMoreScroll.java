@@ -37,12 +37,7 @@ public class CardOnLoadMoreScroll extends RecyclerView.OnScrollListener {
 
         totalItemCount = layoutManager.getItemCount();
 
-        if (layoutManager instanceof StaggeredGridLayoutManager) {
-            int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
-            lastVisibleItem = getLastVisibleItem(lastVisibleItemPositions);
-        } else if (layoutManager instanceof GridLayoutManager) {
-            lastVisibleItem = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
-        } else if (layoutManager instanceof LinearLayoutManager) {
+        if (layoutManager instanceof LinearLayoutManager) {
             lastVisibleItem = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
         }
 

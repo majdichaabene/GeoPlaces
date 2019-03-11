@@ -1,67 +1,80 @@
 package mc.com.geopplaces.models.repositories;
 
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 
-import mc.com.geopplaces.managers.ApiManager;
-import mc.com.geopplaces.managers.ApiServerCallback;
-import mc.com.geopplaces.managers.ConfigManager;
+import io.realm.Realm;
+import mc.com.geopplaces.managers.RealmManager;
+import mc.com.geopplaces.models.dao.DeliveryDao;
 import mc.com.geopplaces.models.entities.DeliveryEntity;
-import mc.com.geopplaces.models.entities.LocationEntity;
+import mc.com.geopplaces.models.responses.DeliveryResponse;
+import mc.com.geopplaces.models.responses.OnDeliveryResponseCallBack;
+import mc.com.geopplaces.utils.Utils;
 
 public class DeliveryRepository {
-    private String endPoint = "/deliveries";
-    private static final int LIMIT_LOAD_DELIVERY = 20;
+    private DeliveryDao deliveryDao;
+    private DeliveryResponse deliveryRepository;
+    private int index = 0;
 
     public DeliveryRepository() {
-
+        deliveryDao = new DeliveryDao(Realm.getDefaultInstance());
+        deliveryRepository = new DeliveryResponse();
     }
 
-    private String getDeliveriesUrl(int offset){
-        return ConfigManager.getInstance().getWebApiRoot() + endPoint + "?offset=" + offset + "&limit=" + LIMIT_LOAD_DELIVERY;
-    }
+    public void getDeliveryList(Context context, final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        RealmManager.open();
+        if (Utils.isNetworkAvailable(context)){
+            deliveryRepository.getDeliveryList(0, new OnDeliveryResponseCallBack() {
+                @Override
+                public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
+                    deliveryDao.save(deliveryEntitiesResult);
+                    index = deliveryDao.loadAll().size();
+                    RealmManager.close();
+                    onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
+                }
 
-    public void getDeliveryList(int offset ,final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
-        ApiManager.getsInstance().GET(getDeliveriesUrl(offset), new ApiServerCallback() {
+                @Override
+                public void onError(String errorState) {
+                    onDeliveryListLoadedCallback.onError(errorState);
+                }
+            });
+        } else {
+            ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
+            deliveryEntities.addAll(deliveryDao.loadAll());
+            RealmManager.close();
+            index = deliveryEntities.size();
+            onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
+        }
+    }
+    public void getNextDeliveryList(final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        RealmManager.open();
+        deliveryRepository.getDeliveryList(index, new OnDeliveryResponseCallBack() {
             @Override
-            public boolean onSuccess(JSONArray result) {
-                onDeliveryListLoadedCallback.onSuccess(parseJsonToDeliveryList(result));
-                return false;
+            public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
+                deliveryDao.save(deliveryEntitiesResult);
+                index = deliveryDao.loadAll().size();
+                RealmManager.close();
+                Log.e("vm","getNextDeliveryList : "+deliveryEntitiesResult.size()+"xxx");
+                onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
             }
 
             @Override
-            public boolean onFailure(String errorState) {
+            public void onError(String errorState) {
                 onDeliveryListLoadedCallback.onError(errorState);
-                return false;
             }
-
         });
     }
 
-    private ArrayList<DeliveryEntity> parseJsonToDeliveryList(JSONArray result) {
-        ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
+    public DeliveryEntity getDeliveryById(int id){
         try {
-            for (int i = 0; i < result.length(); i++) {
-                DeliveryEntity deliveryEntity = new DeliveryEntity();
-                deliveryEntity.setId(result.getJSONObject(i).getInt("id"));
-                deliveryEntity.setDescription(result.getJSONObject(i).getString("description"));
-                deliveryEntity.setImageUrl(result.getJSONObject(i).getString("imageUrl"));
-                LocationEntity locationEntity = new LocationEntity();
-                locationEntity.setLat(result.getJSONObject(i).getJSONObject("location").getDouble("lat"));
-                locationEntity.setLng(result.getJSONObject(i).getJSONObject("location").getDouble("lng"));
-                locationEntity.setAddress(result.getJSONObject(i).getJSONObject("location").getString("address"));
-                deliveryEntity.setLocation(locationEntity);
-                deliveryEntities.add(deliveryEntity);
-            }
-            return deliveryEntities;
-        } catch (JSONException e) {
-            e.printStackTrace();
+            RealmManager.open();
+            return deliveryDao.loadById(id);
+
+        } finally {
+            RealmManager.close();
         }
-
-        return null;
-
     }
 }

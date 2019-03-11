@@ -1,4 +1,4 @@
-package mc.com.geopplaces.managers;
+package mc.com.geopplaces;
 
 import android.app.Application;
 import android.text.TextUtils;
@@ -7,14 +7,17 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class VolleyManager extends Application {
-    public static final String TAG = VolleyManager.class
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
+public class GeoPlacesApplication extends Application {
+    public static final String TAG = GeoPlacesApplication.class
             .getSimpleName();
     private static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
-    private static VolleyManager ourInstance;
+    private static GeoPlacesApplication ourInstance;
     private RequestQueue requestQueue;
 
-    public static synchronized VolleyManager getInstance() {
+    public static synchronized GeoPlacesApplication getInstance() {
 
         return ourInstance;
     }
@@ -23,6 +26,9 @@ public class VolleyManager extends Application {
     public void onCreate() {
         super.onCreate();
         ourInstance = this;
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("delivery.realm").build();
+        Realm.setDefaultConfiguration(config);
     }
 
     public RequestQueue getRequestQueue() {

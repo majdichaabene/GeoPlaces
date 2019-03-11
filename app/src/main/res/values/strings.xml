@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">GeopPlaces</string>
-    <string name="title_tb">Delivery List</string>
+    <string name="title_delivery_tb">Delivery List</string>
     <string name="reload_txt">Reload</string>
 </resources>

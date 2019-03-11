@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.main_tb);
-        toolbar.setTitle(getString(R.string.title_tb));
+        toolbar.setTitle(getString(R.string.title_delivery_tb));
         toolbar.setTitleTextColor(ContextCompat.getColor(this,R.color.colorWhite));
         setSupportActionBar(toolbar);
 

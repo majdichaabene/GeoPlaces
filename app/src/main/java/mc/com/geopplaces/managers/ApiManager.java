@@ -1,20 +1,18 @@
 package mc.com.geopplaces.managers;
 
-import android.util.Log;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import mc.com.geopplaces.GeoPlacesApplication;
 
 public class ApiManager {
 
@@ -75,7 +73,7 @@ public class ApiManager {
             int x = 2;
             jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 4,
                     x, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            VolleyManager.getInstance().addToRequestQueue(jsonObjReq, "tag");
+            GeoPlacesApplication.getInstance().addToRequestQueue(jsonObjReq, "tag");
         } catch (Exception e) {
             e.printStackTrace();
             callback.onFailure(e.getMessage());
@@ -84,7 +82,7 @@ public class ApiManager {
     }
 
     public void CANCELALLPENDINGREQUESTS() {
-        VolleyManager.getInstance().cancelPendingRequests(VolleyManager.class
+        GeoPlacesApplication.getInstance().cancelPendingRequests(GeoPlacesApplication.class
                 .getSimpleName());
     }
 }

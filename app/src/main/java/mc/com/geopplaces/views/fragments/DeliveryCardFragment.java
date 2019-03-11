@@ -30,7 +30,7 @@ public class DeliveryCardFragment extends Fragment {
     private RelativeLayout loadingContainer,reloadContainer;
     private Button reloadButton;
     private DeliveryAdapter deliveryAdapter;
-    private List<DeliveryEntity> deliveryEntities;
+    private ArrayList<DeliveryEntity> deliveryEntities;
     private DeliveryRepository deliveryRepository;
     private CardOnLoadMoreScroll scrollListener;
     private LinearLayoutManager linearLayoutManager;
@@ -99,7 +99,7 @@ public class DeliveryCardFragment extends Fragment {
 
     private void loadFirstData(){
         loadingContainer.setVisibility(View.VISIBLE);
-        deliveryRepository.getDeliveryList(0,  new OnDeliveryListLoadedCallback() {
+        deliveryRepository.getDeliveryList(getContext(),  new OnDeliveryListLoadedCallback() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
                 deliveryEntities.addAll(deliveryEntitiesResult);
@@ -118,7 +118,7 @@ public class DeliveryCardFragment extends Fragment {
 
     private void loadNextDelivery(){
         deliveryAdapter.addLoadingView();
-        deliveryRepository.getDeliveryList(deliveryEntities.get(deliveryEntities.size()-1).getId(), new OnDeliveryListLoadedCallback() {
+        deliveryRepository.getNextDeliveryList( new OnDeliveryListLoadedCallback() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
                 isLoadMore = false;

@@ -86,9 +86,9 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             deliveryItemImageView = view.findViewById(R.id.delivery_item_iv);
         }
 
-        public void bind(final DeliveryEntity deliveryEntity, final CardOnClickListener listener){
-            descriptionTextView.setText(deliveryEntity.getDescription());
-            addressTextView.setText(deliveryEntity.getLocation().getAddress());
+        private void bind(final DeliveryEntity deliveryEntity, final CardOnClickListener listener){
+            descriptionTextView.setText(deliveryEntity.getId()+"xx");
+            addressTextView.setText(deliveryEntity.getAddress());
             Picasso.get()
                     .load(deliveryEntity.getImageUrl())
                     .placeholder(R.drawable.ic_launcher_background)
