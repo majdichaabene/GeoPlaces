@@ -25,13 +25,14 @@ public class DeliveryRepository {
     }
 
     public void getDeliveryList(Context context, final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        Log.e("getDeliveryList","index = "+index);
         RealmManager.open();
         if (Utils.isNetworkAvailable(context)){
             deliveryRepository.getDeliveryList(0, new OnDeliveryResponseCallBack() {
                 @Override
                 public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
                     deliveryDao.save(deliveryEntitiesResult);
-                    index = deliveryDao.loadAll().size();
+                    index = deliveryEntitiesResult.get(deliveryEntitiesResult.size()-1).getId()+1;
                     RealmManager.close();
                     onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);
                 }
@@ -45,17 +46,18 @@ public class DeliveryRepository {
             ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
             deliveryEntities.addAll(deliveryDao.loadAll());
             RealmManager.close();
-            index = deliveryEntities.size();
+            index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
             onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
         }
     }
     public void getNextDeliveryList(final OnDeliveryListLoadedCallback onDeliveryListLoadedCallback){
+        Log.e("getNextDeliveryList","index = "+index);
         RealmManager.open();
         deliveryRepository.getDeliveryList(index, new OnDeliveryResponseCallBack() {
             @Override
             public void onSuccess(ArrayList<DeliveryEntity> deliveryEntitiesResult) {
                 deliveryDao.save(deliveryEntitiesResult);
-                index = deliveryDao.loadAll().size();
+                index = deliveryEntitiesResult.get(deliveryEntitiesResult.size()-1).getId()+1;
                 RealmManager.close();
                 Log.e("vm","getNextDeliveryList : "+deliveryEntitiesResult.size()+"xxx");
                 onDeliveryListLoadedCallback.onSuccess(deliveryEntitiesResult);

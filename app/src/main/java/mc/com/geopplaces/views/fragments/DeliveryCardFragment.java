@@ -75,7 +75,10 @@ public class DeliveryCardFragment extends Fragment {
         deliveryAdapter = new DeliveryAdapter(deliveryEntities, new CardOnClickListener() {
             @Override
             public void onClick(DeliveryEntity deliveryEntity) {
-
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_ll, DeliveryDetailsFragment.newInstance(deliveryEntity.getId()))
+                        .addToBackStack(null)
+                        .commit();
             }
         });
         deliveryRecyclerView.setAdapter(deliveryAdapter);
@@ -98,6 +101,7 @@ public class DeliveryCardFragment extends Fragment {
     }
 
     private void loadFirstData(){
+        deliveryEntities.clear();
         loadingContainer.setVisibility(View.VISIBLE);
         deliveryRepository.getDeliveryList(getContext(),  new OnDeliveryListLoadedCallback() {
             @Override
