@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import mc.com.geopplaces.R;
 import mc.com.geopplaces.models.entities.DeliveryEntity;
 import mc.com.geopplaces.models.repositories.DeliveryRepository;
+import mc.com.geopplaces.utils.Utils;
 
 
 public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallback {
@@ -31,21 +33,29 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
 
     private MapView mapView;
     private GoogleMap googleMap;
-    private int deliveryId;
+    private Integer deliveryId = null;
     private DeliveryRepository deliveryRepository;
     private DeliveryEntity deliveryEntity;
     private TextView descriptionTextView, addressTextView;
     private ImageView deliveryItemImageView;
+    private FrameLayout deliveryContainerLay;
+    private static DeliveryDetailsFragment fragment;
 
     public DeliveryDetailsFragment() {
     }
 
     public static DeliveryDetailsFragment newInstance(int id) {
-        DeliveryDetailsFragment fragment = new DeliveryDetailsFragment();
+        fragment = new DeliveryDetailsFragment();
         Bundle args = new Bundle();
         args.putInt("delivery_id", id);
         fragment.setArguments(args);
         return fragment;
+    }
+    public static DeliveryDetailsFragment getInstance(){
+        return fragment;
+    }
+    public static DeliveryDetailsFragment newInstance() {
+        return new DeliveryDetailsFragment();
     }
 
     private void readBundle(Bundle bundle) {
@@ -58,16 +68,25 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         readBundle(getArguments());
-        deliveryRepository = new DeliveryRepository();
-        deliveryEntity = new DeliveryEntity();
-        deliveryEntity = deliveryRepository.getDeliveryById(deliveryId);
-        addressTextView.setText(deliveryEntity.getAddress());
-        descriptionTextView.setText(deliveryEntity.getDescription());
-        Picasso.get()
-                .load(deliveryEntity.getImageUrl())
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(deliveryItemImageView);
+        if (deliveryId != null){
+            deliveryRepository = new DeliveryRepository();
+            deliveryEntity = new DeliveryEntity();
+            deliveryEntity = deliveryRepository.getDeliveryById(deliveryId);
+            if (!Utils.isTablet(getContext())){
+                deliveryContainerLay.setVisibility(View.VISIBLE);
+                addressTextView.setText(deliveryEntity.getAddress());
+                descriptionTextView.setText(deliveryEntity.getDescription());
+                Picasso.get()
+                        .load(deliveryEntity.getImageUrl())
+                        .placeholder(R.drawable.ic_launcher_background)
+                        .error(R.drawable.ic_launcher_background)
+                        .into(deliveryItemImageView);
+            } else {
+                deliveryContainerLay.setVisibility(View.GONE);
+            }
+        }else
+            deliveryContainerLay.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -75,13 +94,14 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_delivery_details, container, false);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.title_delivery_details_tb);
+        deliveryContainerLay = view.findViewById(R.id.item_container_fl);
         descriptionTextView = view.findViewById(R.id.description_tv);
         addressTextView = view.findViewById(R.id.address_tv);
         deliveryItemImageView = view.findViewById(R.id.delivery_item_iv);
         mapView =  view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
-
+        readBundle(savedInstanceState);
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -94,11 +114,26 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        LatLng location = new LatLng(deliveryEntity.getLat(), deliveryEntity.getLng());
-        this.googleMap .addMarker(new MarkerOptions().position(location).title(deliveryEntity.getAddress()).snippet(deliveryEntity.getDescription()));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(14).build();
-        this.googleMap .animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        LatLng location;
+        if (deliveryId == null){
+            location = new LatLng(22.336093, 114.155288);
+        } else {
+            location = new LatLng(deliveryEntity.getLat(), deliveryEntity.getLng());
+            this.googleMap .addMarker(new MarkerOptions().position(location).title(deliveryEntity.getAddress()).snippet(deliveryEntity.getDescription()));
+        }
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(15).build();
+        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
 
+    public void updatePosition(int id){
+        this.googleMap.clear();
+        DeliveryRepository deliveryRepository2 = new DeliveryRepository();
+        DeliveryEntity deliveryEntity2 = new DeliveryEntity();
+        deliveryEntity2 = deliveryRepository2.getDeliveryById(id);
+        LatLng location = new LatLng(deliveryEntity2.getLat(), deliveryEntity2.getLng());
+        this.googleMap .addMarker(new MarkerOptions().position(location).title(deliveryEntity2.getAddress()).snippet(deliveryEntity2.getDescription()));
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(15).build();
+        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
     @Override
     public void onResume() {

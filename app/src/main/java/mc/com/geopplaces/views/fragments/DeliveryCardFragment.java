@@ -17,6 +17,7 @@ import mc.com.geopplaces.R;
 import mc.com.geopplaces.models.entities.DeliveryEntity;
 import mc.com.geopplaces.models.repositories.DeliveryRepository;
 import mc.com.geopplaces.models.repositories.OnDeliveryListLoadedCallback;
+import mc.com.geopplaces.utils.Utils;
 import mc.com.geopplaces.views.adapters.DeliveryAdapter;
 import mc.com.geopplaces.views.components.CardOnClickListener;
 import mc.com.geopplaces.views.components.CardOnLoadMoreListener;
@@ -69,13 +70,22 @@ public class DeliveryCardFragment extends Fragment {
         deliveryRecyclerView.setLayoutManager(linearLayoutManager);
     }
     private void setEvent(){
-        deliveryAdapter = new DeliveryAdapter(deliveryEntities, new CardOnClickListener() {
+        deliveryAdapter = new DeliveryAdapter(getContext(),deliveryEntities, new CardOnClickListener() {
             @Override
             public void onClick(DeliveryEntity deliveryEntity) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container_ll, DeliveryDetailsFragment.newInstance(deliveryEntity.getId()))
-                        .addToBackStack(null)
-                        .commit();
+                if (Utils.isTablet(getContext())){
+                    ((DeliveryDetailsFragment) getActivity()
+                            .getSupportFragmentManager()
+                            .findFragmentById(R.id.fragment_delivery_details_container_ll)
+                    ).updatePosition(deliveryEntity.getId());
+//                    DeliveryDetailsFragment.getInstance().updatePosition(deliveryEntity.getId());
+                } else {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container_ll, DeliveryDetailsFragment.newInstance(deliveryEntity.getId()))
+                            .addToBackStack(null)
+                            .commit();
+                }
+
             }
         });
         deliveryRecyclerView.setAdapter(deliveryAdapter);

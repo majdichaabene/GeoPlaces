@@ -1,6 +1,8 @@
 package mc.com.geopplaces.views.adapters;
 
+import android.content.Context;
 import android.os.Handler;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +26,11 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private List<DeliveryEntity> deliveryEntities;
     private CardOnClickListener cardOnClickListener;
+    private int selectedIndex = -1;
+    private Context context;
 
-    public DeliveryAdapter(List<DeliveryEntity> deliveryEntities, CardOnClickListener cardOnClickListener) {
+    public DeliveryAdapter(Context context,List<DeliveryEntity> deliveryEntities, CardOnClickListener cardOnClickListener) {
+        this.context = context;
         this.deliveryEntities = deliveryEntities;
         this.cardOnClickListener = cardOnClickListener;
     }
@@ -43,10 +48,37 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        DeliveryEntity deliveryEntity = deliveryEntities.get(position);
+        final DeliveryEntity deliveryEntity = deliveryEntities.get(position);
 
-        if (deliveryEntity != null)
-            ((ItemViewHolder) holder).bind(deliveryEntity,cardOnClickListener);
+        if (deliveryEntity != null){
+            ((ItemViewHolder) holder).descriptionTextView.setText(deliveryEntity.getDescription());
+            ((ItemViewHolder) holder).addressTextView.setText(deliveryEntity.getAddress());
+            Picasso.get()
+                    .load(deliveryEntity.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(((ItemViewHolder) holder).deliveryItemImageView);
+            if (position == selectedIndex){
+                ((ItemViewHolder) holder).cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+                ((ItemViewHolder) holder).addressTextView.setTextColor(context.getResources().getColor(R.color.colorWhite));
+                ((ItemViewHolder) holder).descriptionTextView.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            }
+            else{
+                ((ItemViewHolder) holder).cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorWhite));
+                ((ItemViewHolder) holder).addressTextView.setTextColor(context.getResources().getColor(R.color.colorGray));
+                ((ItemViewHolder) holder).descriptionTextView.setTextColor(context.getResources().getColor(R.color.colorBlack));
+            }
+        }
+
+        ((ItemViewHolder) holder).itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedIndex = position;
+                cardOnClickListener.onClick(deliveryEntity);
+                notifyDataSetChanged();
+            }
+        });
+
     }
 
     public void addLoadingView() {
@@ -78,28 +110,14 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private class ItemViewHolder extends RecyclerView.ViewHolder {
         private TextView descriptionTextView, addressTextView;
         private ImageView deliveryItemImageView;
+        private CardView cardView;
 
         private ItemViewHolder(View view) {
             super(view);
             descriptionTextView = view.findViewById(R.id.description_tv);
             addressTextView = view.findViewById(R.id.address_tv);
             deliveryItemImageView = view.findViewById(R.id.delivery_item_iv);
-        }
-
-        private void bind(final DeliveryEntity deliveryEntity, final CardOnClickListener listener){
-            descriptionTextView.setText(deliveryEntity.getId()+"xx");
-            addressTextView.setText(deliveryEntity.getAddress());
-            Picasso.get()
-                    .load(deliveryEntity.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
-                    .into(deliveryItemImageView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onClick(deliveryEntity);
-                }
-            });
+            cardView = view.findViewById(R.id.container_cv);
         }
     }
 }

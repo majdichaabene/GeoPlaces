@@ -3,6 +3,7 @@ package mc.com.geopplaces.models.repositories;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -38,19 +39,20 @@ public class DeliveryRepository {
 
                     @Override
                     public void onError(String errorState) {
-                        onDeliveryListLoadedCallback.onError(errorState);
+                        if (index == 0 && deliveryDao.loadAll().size() != 0){
+                            ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
+                            deliveryEntities.addAll(deliveryDao.loadAll());
+                            index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
+                            onDeliveryListLoadedCallback.onSuccess(deliveryEntities);
+                        } else {
+                            onDeliveryListLoadedCallback.onError(errorState);
+                        }
                     }
                 });
             } else {
-                if(hasNext){
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            onDeliveryListLoadedCallback.onError("error");
-                        }
-                    },1000);
-                } else {
+                if(!hasNext){
                     if (deliveryDao.loadAll().size() != 0){
+                        Log.e("xxx",deliveryDao.loadAll().size()+"xxx");
                         ArrayList<DeliveryEntity> deliveryEntities = new ArrayList<>();
                         deliveryEntities.addAll(deliveryDao.loadAll());
                         index = deliveryEntities.get(deliveryEntities.size()-1).getId()+1;
@@ -63,6 +65,13 @@ public class DeliveryRepository {
                             }
                         },1000);
                     }
+                } else {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            onDeliveryListLoadedCallback.onError("error");
+                        }
+                    },1000);
                 }
             }
         } finally {

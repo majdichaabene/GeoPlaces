@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".views.activites.MainActivity">
+    tools:context=".views.activities.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/main_tb"
@@ -19,7 +19,7 @@
         android:orientation="horizontal">
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/fragment_delivery_container_ll">
@@ -27,7 +27,7 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="3"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/fragment_delivery_details_container_ll">
