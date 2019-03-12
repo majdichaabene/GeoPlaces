@@ -10,7 +10,6 @@ import mc.com.geopplaces.R;
 import mc.com.geopplaces.utils.Utils;
 import mc.com.geopplaces.views.fragments.DeliveryCardFragment;
 import mc.com.geopplaces.views.fragments.DeliveryDetailsFragment;
-import okhttp3.internal.Util;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.main_tb);
-        toolbar.setTitle(getString(R.string.title_delivery_tb));
+        toolbar.setTitle(getString(R.string.title_delivery_txt));
         toolbar.setTitleTextColor(ContextCompat.getColor(this,R.color.colorWhite));
         setSupportActionBar(toolbar);
 

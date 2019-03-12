@@ -78,8 +78,8 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
                 descriptionTextView.setText(deliveryEntity.getDescription());
                 Picasso.get()
                         .load(deliveryEntity.getImageUrl())
-                        .placeholder(R.drawable.ic_launcher_background)
-                        .error(R.drawable.ic_launcher_background)
+                        .placeholder(R.mipmap.img_place_holder)
+                        .error(R.mipmap.img_place_holder_error)
                         .into(deliveryItemImageView);
             } else {
                 deliveryContainerLay.setVisibility(View.GONE);
@@ -93,7 +93,7 @@ public class DeliveryDetailsFragment extends Fragment implements OnMapReadyCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_delivery_details, container, false);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.title_delivery_details_tb);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.title_delivery_details_txt);
         deliveryContainerLay = view.findViewById(R.id.item_container_fl);
         descriptionTextView = view.findViewById(R.id.description_tv);
         addressTextView = view.findViewById(R.id.address_tv);

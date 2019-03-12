@@ -55,8 +55,8 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((ItemViewHolder) holder).addressTextView.setText(deliveryEntity.getAddress());
             Picasso.get()
                     .load(deliveryEntity.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
+                    .placeholder(R.mipmap.img_place_holder)
+                    .error(R.mipmap.img_place_holder_error)
                     .into(((ItemViewHolder) holder).deliveryItemImageView);
             if (position == selectedIndex){
                 ((ItemViewHolder) holder).cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorAccent));
